@@ -1,14 +1,18 @@
-from flask import Flask,jsonify
-from flask_restful import Api
-from flask_redis import FlaskRedis
-
 import os
-from error_handler_service import InvalidUsageError
-app = Flask(__name__)
-api=Api(app)
 
-app.config['SECRET_KEY'] = "kdjghodiuthdfpotjkfhdh12jkgkjg"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///bookstore_db.db"
+from flask import Flask, jsonify
+from flask_redis import FlaskRedis
+from flask_restful import Api
+
+from error_handler_service import InvalidUsageError
+
+
+app = Flask(__name__)
+api = Api(app)
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+
 
 @app.errorhandler(InvalidUsageError)
 def handle_invalid_usage(error):
