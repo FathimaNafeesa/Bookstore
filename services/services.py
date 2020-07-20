@@ -93,8 +93,23 @@ def sort_books(sort_parameter):
         column_names = ProductData.__table__.columns.keys()
         if sort_parameter in column_names:
             sorted_books = ProductData.query.order_by(desc(sort_parameter)).all()
-                      
+            return calling_book_details(sorted_books)
+
     except (InvalidRequestError,OperationalError,CompileError) :
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
-
+def calling_book_details(sorted_books):
+    book_list = []
+        for each_book in sorted_books:
+            book_list.append(
+                {
+                "book_id":each_book.id,
+                "author" : each_book.author,
+                "title" : each_book.title,
+                "image" : each_book.image,
+                "quantity" : each_book.quantity,
+                "price" : each_book.price,
+                "description":each_book.description
+                }
+            )
+        return book_list
