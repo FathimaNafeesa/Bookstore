@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
-from model import User, db
+from model import User, db, ProductData
 
 redis_db = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -32,7 +32,7 @@ def send_otp(phone, otp):
         from_=os.getenv('from_phone_number'),
         body=otp)
     except Exception:
-        return make_response(jsonify({'response': "invalid phone number"})
+        return make_response(jsonify({'response': "invalid phone number"}))
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('phone number is improper', 500)
 
@@ -54,18 +54,26 @@ def insert_to_user_db(username, email, password, phone):
 
 
 def store_otp(phone, otp):
-    redis_db.set(phone, otp.encode('utf-8'))
-    redis_db.expire(phone, 1800)
+    try:
+        redis_db.set(phone, otp.encode('utf-8'))
+        redis_db.expire(phone, 1800)
+    except Exception:
+        raise InvalidUsageError('encoding error,try again', 500)
+
 
 
 def check_otp(entered_otp, phone):
-    otp = redis_db.get(phone).decode('utf-8')
-    user = User.query.filter_by(phone=phone).first()
-    if otp == entered_otp:
-        user.is_verified = 1
-        db.session.commit()
-    else:
-        return make_response(jsonify({'response': "Invalid otp"}), 400)
+    try:
+        otp = redis_db.get(phone).decode('utf-8')
+        user = User.query.filter_by(phone=phone).first()
+        if otp == entered_otp:
+            user.is_verified = 1
+            db.session.commit()
+        else:
+            return make_response(jsonify({'response': "Invalid otp or expired otp"}), 400)
+    except (InvalidRequestError, OperationalError):
+        raise InvalidUsageError('sql connection or syntax is improper', 500)
+    
 
 
 def check_for_user_in_db(user_name, password):
@@ -78,3 +86,11 @@ def check_for_user_in_db(user_name, password):
             return False
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
+#book sorting
+def sort_books(sort_parameter):
+    try:
+        sorted_books = ProductData.query.order_by(desc(sort_parameter)).all()
+    except (InvalidRequestError, OperationalError):
+        raise InvalidUsageError('Not a valid key', 500)
+
