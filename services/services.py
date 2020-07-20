@@ -90,7 +90,11 @@ def check_for_user_in_db(user_name, password):
 #book sorting
 def sort_books(sort_parameter):
     try:
-        sorted_books = ProductData.query.order_by(desc(sort_parameter)).all()
-    except (InvalidRequestError, OperationalError):
-        raise InvalidUsageError('Not a valid key', 500)
+        column_names = ProductData.__table__.columns.keys()
+        if sort_parameter in column_names:
+            sorted_books = ProductData.query.order_by(desc(sort_parameter)).all()
+                      
+    except (InvalidRequestError,OperationalError,CompileError) :
+            raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
 
