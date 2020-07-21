@@ -22,3 +22,8 @@ class ProductData(db.Model):
     quantity = db.Column(db.Integer)
     price = db.Column(db.Integer)
     description = db.Column(db.String(6000))
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(25), unique=True)
+    phone = db.Column(db.String(10), unique=True)
