@@ -3,7 +3,8 @@ import random as r
 
 import redis
 from flask import jsonify, make_response
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError,OperationalError,InvalidRequestError,CompileError
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
@@ -100,16 +101,26 @@ def sort_books(sort_parameter):
 
 def calling_book_details(sorted_books):
     book_list = []
-        for each_book in sorted_books:
-            book_list.append(
-                {
-                "book_id":each_book.id,
-                "author" : each_book.author,
-                "title" : each_book.title,
-                "image" : each_book.image,
-                "quantity" : each_book.quantity,
-                "price" : each_book.price,
-                "description":each_book.description
-                }
-            )
-        return book_list
+    for each_book in sorted_books:
+        book_list.append(
+            {
+            "book_id":each_book.id,
+            "author" : each_book.author,
+            "title" : each_book.title,
+            "image" : each_book.image,
+            "quantity" : each_book.quantity,
+            "price" : each_book.price,
+            "description":each_book.description
+            }
+        )
+    return book_list
+
+def search_books(search_parameter):
+    try:
+        search_result = ProductData.query.filter_by(title=search_parameter).first()
+        if search_result==None:
+            search_result = ProductData.query.filter_by(author=search_parameter)
+            search_result = calling_book_details(search_result)
+        return search_result
+    except (InvalidRequestError,OperationalError,CompileError) :
+            raise InvalidUsageError('mysql connection or syntax is improper', 500)
