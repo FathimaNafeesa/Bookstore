@@ -65,7 +65,8 @@ class Login(Resource):
         password = form.password.data
         present_in_db = check_for_user_in_db(user_name, password)
         if present_in_db:
-            return make_response(jsonify({"response": "logged in"}))
+            access_token = create_access_token(identity=username)
+            return jsonify(access_token=access_token), 200
         return make_response(jsonify({"response": "not a user"}))
 
 
