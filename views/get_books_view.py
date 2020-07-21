@@ -6,11 +6,14 @@ from flask_restful import Resource
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import  BadRequestKeyError
 from services.services import  sort_books,calling_book_details,search_books
+from flasgger.utils import swag_from
+from app import app,api
 
-from app import api, app
-
-
+# @bookstore_blueprint.route('/Books/', methods=['GET', 'POST'])
+# @swag_from('books.yml', methods=['GET'])
+# @swag_from('books.yml', methods=['POST'])
 class Books(Resource):
+    
     def get(self):
         #to sort
         try:
@@ -21,6 +24,7 @@ class Books(Resource):
         except BadRequestKeyError:
             return make_response(jsonify({"response": "unsort book list called"}), 200)
 
+    
     def post(self):
         try:
             book_form = request.form
