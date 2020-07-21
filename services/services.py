@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError,OperationalError,InvalidRequestError,C
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
-from model import User, db, ProductData
+from model import User, db, ProductData, Admin
 
 redis_db = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -124,3 +124,23 @@ def search_books(search_parameter):
         return search_result
     except (InvalidRequestError,OperationalError,CompileError) :
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
+def check_for_admin_in_db(user_name):
+    try:
+        user = Admin.query.filter_by(username=user_name).first()
+        if user:
+            phone = user.phone
+            return phone
+    except (InvalidRequestError, OperationalError):
+        raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
+def check_admin_otp(entered_otp,phone):
+    try:
+        otp = redis_db.get(phone).decode('utf-8')
+        user = User.query.filter_by(phone=phone).first()
+        if otp == entered_otp:
+            return True
+        return False
+    except (InvalidRequestError, OperationalError):
+        raise InvalidUsageError('sql connection or syntax is improper', 500)
+    
