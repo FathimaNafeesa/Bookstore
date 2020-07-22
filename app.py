@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv(verbose=True)
 import os
 
+
 from flask import Flask, jsonify,Blueprint
 from flask_redis import FlaskRedis
 from flask_restful import Api
@@ -12,15 +13,10 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-jwt = JWTManager(app)
-
-
-
-
-
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+jwt = JWTManager(app)
 #frombookstore_blueprint = Blueprint("bookstore_blueprint", __name__)
 
 api = Api(app)
