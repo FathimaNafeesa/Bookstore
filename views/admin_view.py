@@ -31,7 +31,8 @@ class AdminLogin(Resource):
         entered_otp = otp_form.otp.data
         valid_admin = check_admin_otp(entered_otp,phone)
         if valid_admin:
-            return make_response(jsonify({"response": "logged in"}),200)
+            access_token = create_access_token(identity=username)
+            return jsonify(access_token=access_token), 200
         return make_response(jsonify({"response": "not an admin"}))
     
 
