@@ -8,7 +8,7 @@ from app import app,api
 from forms import LoginForm,ActivationForm
 from services.services import (check_otp, otp_gen, send_otp, store_otp, check_for_admin_in_db,check_admin_otp)
 from services.admin_services import AdminServices
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required,create_access_token
 
 
 class AdminLogin(Resource):
@@ -26,14 +26,15 @@ class AdminLogin(Resource):
         return make_response(jsonify({"response": "otp send"}),200)
 
         
-    def put(self,phone):
-        otp_form = ActivationForm(request.form)
+    def put(self):
+        otp_form = ActivationForm()
         entered_otp = otp_form.otp.data
+        phone = otp_form.phone.data
         valid_admin = check_admin_otp(entered_otp,phone)
         if valid_admin:
-            access_token = create_access_token(identity=username)
-            return jsonify(access_token=access_token), 200
-        return make_response(jsonify({"response": "not an admin"}))
+            access_token = create_access_token(identity=phone)
+            return  make_response( jsonify(access_token=access_token),200)
+        return make_response(jsonify({"response": "not an admin"}),200)
     
 
 api.add_resource(AdminLogin, '/admin')
@@ -48,7 +49,7 @@ class AdminPage(Resource):
     def post(self):
         action = request.get_data
         book_details = request.get_json() 
-        if action == 'add'        
+        if action == 'add':       
             id = book_details.get['id']
             title = book_details.get['title']
             author = book_details.get['author']
@@ -60,7 +61,7 @@ class AdminPage(Resource):
             if status:
                 return make_response(jsonify({"respone": "admin added a book"}), 200)
             return make_response(jsonify({"respone": "action failed"}), 400)
-        if action == 'delete'
+        if action == 'delete':
             id = book_details.get['id']
             status = AdminServices.delete_book(id)
             if status:

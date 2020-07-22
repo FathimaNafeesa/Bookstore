@@ -7,6 +7,7 @@ from app import app,api
 from forms import ActivationForm, LoginForm, RegisterForm
 from services.services import (check_for_user_in_db, check_otp, insert_to_user_db,
                       otp_gen, send_otp, store_otp)
+from flask_jwt_extended import create_access_token
 
 # @bookstore_blueprint.route('/register/', methods=['GET', 'POST'])
 # @swag_from('register.yml', methods=['GET'])
@@ -65,8 +66,8 @@ class Login(Resource):
         password = form.password.data
         present_in_db = check_for_user_in_db(user_name, password)
         if present_in_db:
-            access_token = create_access_token(identity=username)
-            return jsonify(access_token=access_token), 200
+            access_token = create_access_token(identity=user_name)
+            return make_response(jsonify(access_token=access_token), 200)
         return make_response(jsonify({"response": "not a user"}))
 
 
