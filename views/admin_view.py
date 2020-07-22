@@ -6,8 +6,9 @@ from flask_restful import Resource
 from flasgger.utils import swag_from
 from app import app,api
 from forms import LoginForm,ActivationForm
-from services.services import (check_for_user_in_db, check_otp, insert_to_user_db,
-                      otp_gen, send_otp, store_otp,check_for_admin_in_db,check_admin_otp)
+from services.services import (check_otp, otp_gen, send_otp, store_otp, check_for_admin_in_db,check_admin_otp)
+from services.admin_services import add_books
+from flask_jwt_extended import jwt_required
 
 
 class AdminLogin(Resource):
@@ -16,7 +17,6 @@ class AdminLogin(Resource):
         return make_response(jsonify({"respone": "get request called for admin login"}), 200)
     
     def post(self):
-        print("ddd")
         form=LoginForm(request.form)
         admin_username = form.username.data
         phone = check_for_admin_in_db(admin_username)
@@ -37,3 +37,22 @@ class AdminLogin(Resource):
     
 
 api.add_resource(AdminLogin, '/admin')
+
+class AdminPage(Resource):
+
+    @jwt_required
+    def get(self):
+        return make_response(jsonify({"respone": "admin can add and delete books from admin page"}), 200)
+    
+    @jwt_required
+    def post(self):
+        book_details = request.get_json()
+        id = book_details.get['id']
+        title = book_details.get['title']
+        author = book_details.get['author']
+        image = book_details.get['image']
+        quantity = book_details.get['quantity']
+        price = book_details.get['price']
+        description = book_details.get['description']
+        status = add_book(id,title,author,image,quantity,price,description)
+
