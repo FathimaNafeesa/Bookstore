@@ -24,4 +24,3 @@ class ActivationForm(FlaskForm):
 class LoginForm(Form):
     username = StringField('username', [validators.Length(min=4, max=25)])
     password = PasswordField('password', [validators.Length(min=8, max=50)])
-    
