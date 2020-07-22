@@ -7,7 +7,7 @@ from flasgger.utils import swag_from
 from app import app,api
 from forms import LoginForm,ActivationForm
 from services.services import (check_otp, otp_gen, send_otp, store_otp, check_for_admin_in_db,check_admin_otp)
-from services.admin_services import add_books
+from services.admin_services import add_books,delete_book
 from flask_jwt_extended import jwt_required
 
 
@@ -46,13 +46,26 @@ class AdminPage(Resource):
     
     @jwt_required
     def post(self):
-        book_details = request.get_json()
-        id = book_details.get['id']
-        title = book_details.get['title']
-        author = book_details.get['author']
-        image = book_details.get['image']
-        quantity = book_details.get['quantity']
-        price = book_details.get['price']
-        description = book_details.get['description']
-        status = add_book(id,title,author,image,quantity,price,description)
+        action = request.get_data
+        book_details = request.get_json() 
+        if action == 'add'        
+            id = book_details.get['id']
+            title = book_details.get['title']
+            author = book_details.get['author']
+            image = book_details.get['image']
+            quantity = book_details.get['quantity']
+            price = book_details.get['price']
+            description = book_details.get['description']
+            status = add_book(id,title,author,image,quantity,price,description)
+            if status:
+                return make_response(jsonify({"respone": "admin added a book"}), 200)
+            return make_response(jsonify({"respone": "action failed"}), 400)
+        if action == 'delete'
+            id = book_details.get['id']
+            status = delete_book(id)
+            if status:
+                return make_response(jsonify({"respone": "admin deleted a book"}), 200)
+            return make_response(jsonify({"respone": "action failed"}), 400)
+
+            
 
