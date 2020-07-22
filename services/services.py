@@ -137,7 +137,6 @@ def check_for_admin_in_db(user_name):
 def check_admin_otp(entered_otp,phone):
     try:
         otp = redis_db.get(phone).decode('utf-8')
-        user = User.query.filter_by(phone=phone).first()
         if otp == entered_otp:
             return True
         return False

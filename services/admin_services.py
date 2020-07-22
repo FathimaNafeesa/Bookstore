@@ -22,5 +22,4 @@ class AdminServices:
             return "Done"
         except (InvalidRequestError,OperationalError,CompileError) :
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
-        
 
