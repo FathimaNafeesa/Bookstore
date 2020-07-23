@@ -9,6 +9,9 @@ from forms import LoginForm,ActivationForm
 from services.services import (check_otp, otp_gen, send_otp, store_otp, check_for_admin_in_db,check_admin_otp)
 from services.admin_services import add_books,delete_book
 from flask_jwt_extended import jwt_required,create_access_token
+from marshmallow import Schema
+from model import product_data_schema
+
 
 
 class AdminLogin(Resource):
@@ -41,32 +44,27 @@ api.add_resource(AdminLogin, '/admin')
 
 class AdminPage(Resource):
 
-    #@jwt_required
+    @jwt_required
     def get(self):
-        return make_response(jsonify({"respone": "admin can add and delete books from admin page"}), 200)
+        return make_response(jsonify({"response": "admin can add and delete books from admin page"}), 200)
     
     #@jwt_required
     def post(self):
         action = request.args['action']
-        book_details = request.get_json() 
+        book_detail = request.get_json()
+        book_details = product_data_schema.load(book_detail)
+        print(book_details)
         if action == 'add':       
-            id = book_details['id']
-            title = book_details['title']
-            author = book_details['author']
-            image = book_details['image']
-            quantity = book_details['quantity']
-            price = book_details['price']
-            description = book_details['description']
-            status = add_books(id,title,author,image,quantity,price,description)
+            status = add_books(book_details['id'],book_details['title'], book_details['author'],book_details['image'],book_details['quantity'],book_details['price'],book_details['description'])
             if status:
-                return make_response(jsonify({"respone": "admin added a book"}), 200)
-            return make_response(jsonify({"respone": "action failed"}), 400)
+                return make_response(jsonify({"response": "admin added a book"}), 200)
+            return make_response(jsonify({"response": "action failed"}), 400)
         if action == 'delete':
             id = book_details['id']
             status = delete_book(id)
             if status:
-                return make_response(jsonify({"respone": "admin deleted a book"}), 200)
-            return make_response(jsonify({"respone": "action failed"}), 400)
+                return make_response(jsonify({"response": "admin deleted a book"}), 200)
+            return make_response(jsonify({"response": "action failed"}), 400)
 
 api.add_resource(AdminPage, '/adminpage')
 
