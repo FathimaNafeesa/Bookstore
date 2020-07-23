@@ -1,10 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
-
-
+from flask_marshmallow import Marshmallow
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from app import app
 from marshmallow import Schema, fields, ValidationError, pre_load
 
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 relationship_table = db.Table('relationship_table', db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key = True),
             db.Column('product_id', db.Integer, db.ForeignKey('product_data.id'), primary_key = True))
@@ -35,16 +36,18 @@ class Admin(db.Model):
 
 
 # # SCHEMAS
+class ProductDataSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ProductData
+        include_fk = True
+
+class UserSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        include_fk = True
 
 
-class ProductDataSchema(Schema):
-    id = fields.Int(required=True)
-    author = fields.Str(required=True)
-    title = fields.Str(required=True)
-    image = fields.Str(required=True)
-    quantity = fields.Int(required=True)
-    price = fields.Int(required=True )
-    description = fields.Str(required=True)
-    
+
 product_data_schema = ProductDataSchema()
-#product_data_schema = ProductDataSchema(many=True)
+user_schema = UserSchema()
+
