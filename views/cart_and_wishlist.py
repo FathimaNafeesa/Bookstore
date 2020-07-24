@@ -58,5 +58,6 @@ class Cart(Resource):
             return make_response(jsonify({"response" : "action failed"}), 200)
     
 
-    
+api.add_resource(Cart,'/cart')
+
     
