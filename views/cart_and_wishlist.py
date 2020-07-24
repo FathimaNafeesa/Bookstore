@@ -7,7 +7,7 @@ from app import app,api
 from flask_jwt_extended import jwt_required,create_access_token,get_jwt_identity
 from marshmallow import Schema
 from model import product_data_schema,user_schema
-from services.login_services import display_wishlist,add_books_to_wishlist
+from services.login_services import display_wishlist,add_books_to_wishlist,delete_book_from_cart
 from services.services import calling_book_details
 
 
@@ -52,6 +52,8 @@ class Cart(Resource):
         product_id = product['id']
         if action == "add":
             status = add_books_to_cart(product_id,username)
+        if action == "delete":
+            status = delete_book_from_cart(product_id,username)
         if status:        
             return make_response(jsonify({"cart": action }), 200)
         else:
