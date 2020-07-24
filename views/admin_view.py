@@ -48,7 +48,7 @@ class AdminPage(Resource):
     def get(self):
         return make_response(jsonify({"response": "admin can add and delete books from admin page"}), 200)
     
-    #@jwt_required
+    @jwt_required
     def post(self):
         action = request.args['action']
         book_detail = request.get_json()
@@ -56,15 +56,12 @@ class AdminPage(Resource):
         print(book_details)
         if action == 'add':       
             status = add_books(book_details['id'],book_details['title'], book_details['author'],book_details['image'],book_details['quantity'],book_details['price'],book_details['description'])
-            if status:
-                return make_response(jsonify({"response": "admin added a book"}), 200)
-            return make_response(jsonify({"response": "action failed"}), 400)
         if action == 'delete':
             id = book_details['id']
             status = delete_book(id)
-            if status:
-                return make_response(jsonify({"response": "admin deleted a book"}), 200)
-            return make_response(jsonify({"response": "action failed"}), 400)
-
+        if status:
+            return make_response(jsonify({"response": "action successful",
+                                         "action": action}), 200)
+        return make_response(jsonify({"response": "action failed"}), 400)
 api.add_resource(AdminPage, '/adminpage')
 
