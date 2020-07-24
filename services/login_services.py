@@ -26,6 +26,21 @@ def add_books_to_wishlist(id,username):
     except (InvalidRequestError,OperationalError,CompileError) :
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
+def display_cart(username):
+    try:
+        user = User.query.filter_by(username = username).first()
+        cart = user.cart
+        if cart:
+            cart = calling_book_details(cart)
+        else:
+            cart = "empty"
+        return cart
+    except (InvalidRequestError,OperationalError,CompileError) :
+            raise InvalidUsageError('mysql connection or syntax is improper', 500) 
+
+        
+
+
 
 
     
