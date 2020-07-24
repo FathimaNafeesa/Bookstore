@@ -10,6 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
 from model import User, db, ProductData, Admin
 
+
 redis_db = redis.Redis(host='localhost', port=6379, db=0)
 
 # function for otp generation
@@ -76,7 +77,6 @@ def check_otp(entered_otp, phone):
         raise InvalidUsageError('sql connection or syntax is improper', 500)
     
 
-
 def check_for_user_in_db(user_name, password):
     try:
         user = User.query.filter_by(username=user_name).first()
@@ -131,6 +131,7 @@ def check_for_admin_in_db(user_name):
         if user:
             phone = user.phone
             return phone
+        return make_response(jsonify({'response:' 'Not an admin'}))
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
