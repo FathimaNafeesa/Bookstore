@@ -9,6 +9,7 @@ from flask_restful import Api
 from flasgger import Swagger
 from flasgger.utils import swag_from
 from services.error_handler_service import InvalidUsageError
+
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
@@ -33,3 +34,4 @@ def handle_invalid_usage(error):
 from views.login_and_registration_view import *
 from views.get_books_view import *
 from views.admin_view import *
+from views.cart_and_wishlist import *
