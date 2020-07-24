@@ -27,6 +27,8 @@ class WishList(Resource):
         product_id = product['id']
         if action == "add":
             status = add_books_to_wishlist(product_id,username)
+        if action == "delete":
+            status = delete_book_from_wishlist(product_id,username)
         if status:        
             return make_response(jsonify({"Wishlist": action }), 200)
         else:
