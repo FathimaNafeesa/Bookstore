@@ -16,5 +16,16 @@ def display_wishlist(username):
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
 
+def add_books_to_wishlist(id,username):
+    try:
+        user = User.query.filter_by(username = username).first()
+        book = ProductData.query.filter_by(id=id).first()
+        book.products.append(user)
+        db.session.commit()
+        return True
+    except (InvalidRequestError,OperationalError,CompileError) :
+            raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
+
 
     
