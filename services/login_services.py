@@ -38,6 +38,16 @@ def display_cart(username):
     except (InvalidRequestError,OperationalError,CompileError) :
             raise InvalidUsageError('mysql connection or syntax is improper', 500) 
 
+def add_books_to_cart(id,username):
+    try:
+        user = User.query.filter_by(username = username).first()
+        book = ProductData.query.filter_by(id=id).first()
+        book.products_to_order.append(user)
+        db.session.commit()
+        return True
+    except (InvalidRequestError,OperationalError,CompileError) :
+            raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
         
 
 

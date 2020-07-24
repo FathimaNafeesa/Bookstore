@@ -42,6 +42,20 @@ class Cart(Resource):
         username = get_jwt_identity()
         wishlist = display_wishlist(username)
         return make_response(jsonify({"Wishlist": wishlist }), 200)
+
+            
+    @jwt_required
+    def post(self):
+        username = get_jwt_identity()
+        action = request.args['action']
+        product = request.get_json()
+        product_id = product['id']
+        if action == "add":
+            status = add_books_to_cart(product_id,username)
+        if status:        
+            return make_response(jsonify({"Wishlist": action }), 200)
+        else:
+            return make_response(jsonify({"response" : "action failed"}), 200)
     
     
     
