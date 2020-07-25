@@ -4,7 +4,7 @@ import random as r
 import redis
 from flask import jsonify, make_response
 from sqlalchemy import desc
-from sqlalchemy.exc import IntegrityError,OperationalError,InvalidRequestError,CompileError
+from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError, CompileError
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
@@ -24,15 +24,16 @@ def otp_gen():
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('sql connection or syntax is improper', 500)
 
+
 def send_otp(phone, otp):
     try:
         account_sid = os.getenv('account_sid')
         auth_token = os.getenv('auth_token')
         client = Client(account_sid, auth_token)
         message = client.messages.create(
-        to=phone,
-        from_=os.getenv('from_phone_number'),
-        body=otp)
+            to=phone,
+            from_=os.getenv('from_phone_number'),
+            body=otp)
     except Exception:
         return make_response(jsonify({'response': "invalid phone number"}))
     except (InvalidRequestError, OperationalError):
@@ -63,7 +64,6 @@ def store_otp(phone, otp):
         raise InvalidUsageError('encoding error,try again', 500)
 
 
-
 def check_otp(entered_otp, phone):
     try:
         otp = redis_db.get(phone).decode('utf-8')
@@ -75,7 +75,7 @@ def check_otp(entered_otp, phone):
             return make_response(jsonify({'response': "Invalid otp or expired otp"}), 400)
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('sql connection or syntax is improper', 500)
-    
+
 
 def check_for_user_in_db(user_name, password):
     try:
@@ -88,42 +88,50 @@ def check_for_user_in_db(user_name, password):
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
-#book sorting
+# book sorting
+
+
 def sort_books(sort_parameter):
     try:
         column_names = ProductData.__table__.columns.keys()
         if sort_parameter in column_names:
-            sorted_books = ProductData.query.order_by(desc(sort_parameter)).all()
+            sorted_books = ProductData.query.order_by(
+                desc(sort_parameter)).all()
             return calling_book_details(sorted_books)
 
-    except (InvalidRequestError,OperationalError,CompileError) :
-            raise InvalidUsageError('mysql connection or syntax is improper', 500)
+    except (InvalidRequestError, OperationalError, CompileError):
+        raise InvalidUsageError('mysql connection or syntax is improper', 500)
+
 
 def calling_book_details(sorted_books):
     book_list = []
     for each_book in sorted_books:
         book_list.append(
             {
-            "book_id":each_book.id,
-            "author" : each_book.author,
-            "title" : each_book.title,
-            "image" : each_book.image,
-            "quantity" : each_book.quantity,
-            "price" : each_book.price,
-            "description":each_book.description
+                "book_id": each_book.id,
+                "author": each_book.author,
+                "title": each_book.title,
+                "image": each_book.image,
+                "quantity": each_book.quantity,
+                "price": each_book.price,
+                "description": each_book.description
             }
         )
     return book_list
 
+
 def search_books(search_parameter):
     try:
-        search_result = ProductData.query.filter_by(title=search_parameter).first()
-        if search_result==None:
-            search_result = ProductData.query.filter_by(author=search_parameter)
+        search_result = ProductData.query.filter_by(
+            title=search_parameter).first()
+        if search_result == None:
+            search_result = ProductData.query.filter_by(
+                author=search_parameter)
             search_result = calling_book_details(search_result)
         return search_result
-    except (InvalidRequestError,OperationalError,CompileError) :
-            raise InvalidUsageError('mysql connection or syntax is improper', 500)
+    except (InvalidRequestError, OperationalError, CompileError):
+        raise InvalidUsageError('mysql connection or syntax is improper', 500)
+x
 
 def check_for_admin_in_db(user_name):
     try:
@@ -135,7 +143,8 @@ def check_for_admin_in_db(user_name):
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
-def check_admin_otp(entered_otp,phone):
+
+def check_admin_otp(entered_otp, phone):
     try:
         otp = redis_db.get(phone).decode('utf-8')
         if otp == entered_otp:
@@ -143,4 +152,3 @@ def check_admin_otp(entered_otp,phone):
         return False
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('sql connection or syntax is improper', 500)
-    

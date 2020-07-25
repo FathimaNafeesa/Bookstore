@@ -3,20 +3,22 @@ from flask import (jsonify, make_response, redirect, render_template, request,
                    session, url_for)
 from flask_restful import Resource
 from flasgger.utils import swag_from
-from app import app,api
+from app import app, api
 from forms import ActivationForm, LoginForm, RegisterForm
 from services.services import (check_for_user_in_db, check_otp, insert_to_user_db,
-                      otp_gen, send_otp, store_otp)
+                               otp_gen, send_otp, store_otp)
 from flask_jwt_extended import create_access_token
 
 # @bookstore_blueprint.route('/register/', methods=['GET', 'POST'])
 # @swag_from('register.yml', methods=['GET'])
 # @swag_from('register.yml', methods=['POST'])
+
+
 class Register(Resource):
 
     def get(self):
         return make_response(jsonify({"respone": "get request called for register"}), 200)
-    
+
     def post(self):
         form = RegisterForm()
         user_name = form.username.data
@@ -32,15 +34,16 @@ class Register(Resource):
 
 api.add_resource(Register, '/')
 
-#@bookstore_blueprint.route('/Activation/', methods=['GET', 'POST'])
-#@swag_from('activation.yml', methods=['GET'])
-#@swag_from('activation.yml', methods=['POST'])
+# @bookstore_blueprint.route('/Activation/', methods=['GET', 'POST'])
+# @swag_from('activation.yml', methods=['GET'])
+# @swag_from('activation.yml', methods=['POST'])
+
+
 class Activation(Resource):
-    
+
     def get(self):
         return make_response(jsonify({"response": "otp verification request"}), 200)
 
-    
     def post(self):
         form_1 = ActivationForm()
         entered_otp = form_1.otp.data
@@ -54,12 +57,13 @@ api.add_resource(Activation, '/activation')
 # @bookstore_blueprint.route('/Login/', methods=['GET', 'POST'])
 # @swag_from('login.yml', methods=['GET'])
 # @swag_from('login.yml', methods=['POST'])
+
+
 class Login(Resource):
-    
+
     def get(self):
         return make_response(jsonify({"response": "login request"}))
 
-    
     def post(self):
         form = LoginForm()
         user_name = form.username.data
