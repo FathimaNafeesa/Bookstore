@@ -3,7 +3,7 @@ import random as r
 
 import redis
 from flask import jsonify, make_response
-from sqlalchemy import desc
+from sqlalchemy import desc,asc
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError, CompileError
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -96,7 +96,7 @@ def sort_books(sort_parameter):
         column_names = ProductData.__table__.columns.keys()
         if sort_parameter in column_names:
             sorted_books = ProductData.query.order_by(
-                desc(sort_parameter)).all()
+                asc(sort_parameter)).all()
             return calling_book_details(sorted_books)
 
     except (InvalidRequestError, OperationalError, CompileError):
