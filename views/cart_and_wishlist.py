@@ -7,27 +7,27 @@ from app import app,api
 from flask_jwt_extended import jwt_required,create_access_token,get_jwt_identity
 from marshmallow import Schema
 from model import product_data_schema,user_schema
-from services.cart_and_wishlist_services import display_wishlist,add_or_delete_books_in_wishlist,add_or_delete_books_to_cart,display_cart
+from services.cart_and_wishlist_services import display_wishlist_or_cart,add_or_delete_books
 from services.services import calling_book_details
 
 
 class WishList(Resource):
 
-    jwt_required
+    @jwt_required
     def get(self):
+        username = get_jwt_identity()
+        wishlist = display_wishlist_or_cart(username,0)
+        return make_response(wishlist, 200)
+        
+    #jwt_required
+    def post(self):
         username = "chachu"
         #get_jwt_identity()
-        wishlist = display_wishlist(username)
-        return make_response(jsonify({"Wishlist": wishlist }), 200)
-        
-    @jwt_required
-    def post(self):
-        username = get_jwt_identity()
         action = request.args['action']
         product = request.get_json()
         product_id = product['id']
         if action:
-            status = add_or_delete_books_in_wishlist(product_id,username,action)
+            status = add_or_delete_books(product_id,username,action,0)
         if status:        
             return make_response(jsonify({"Wishlist": action, 
             "status": "completed" }), 200)
@@ -42,7 +42,7 @@ class Cart(Resource):
     @jwt_required
     def get(self):
         username = get_jwt_identity()
-        cart = display_cart(username)
+        cart = display_wishlist_or_cart(username,1)
         return make_response(jsonify({"cart": cart }), 200)
 
             
@@ -53,7 +53,7 @@ class Cart(Resource):
         product = request.get_json()
         product_id = product['id']
         if action:
-            status = add_or_delete_books_to_cart(product_id,username,action)
+            status = add_or_delete_books(product_id,username,action,1)
         if status:        
             return make_response(jsonify({"cart": action }), 200)
         else:
