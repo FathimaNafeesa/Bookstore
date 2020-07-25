@@ -21,6 +21,6 @@ class ActivationForm(FlaskForm):
     submit = SubmitField('check otp')
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField('username', [validators.Length(min=4, max=25)])
     password = PasswordField('password', [validators.Length(min=8, max=50)])
