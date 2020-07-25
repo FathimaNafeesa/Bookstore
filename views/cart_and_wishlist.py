@@ -7,16 +7,17 @@ from app import app,api
 from flask_jwt_extended import jwt_required,create_access_token,get_jwt_identity
 from marshmallow import Schema
 from model import product_data_schema,user_schema
-from services.login_services import display_wishlist,add_books_to_wishlist,delete_book_from_cart
+from services.cart_and_wishlist_services import display_wishlist,add_or_delete_books_in_wishlist,add_or_delete_books_to_cart,display_cart
 from services.services import calling_book_details
 
 
 class WishList(Resource):
 
-    @jwt_required
+    jwt_required
     def get(self):
-        username = get_jwt_identity()
-        wishlist = display_wishlist(username,wishlist)
+        username = "chachu"
+        #get_jwt_identity()
+        wishlist = display_wishlist(username)
         return make_response(jsonify({"Wishlist": wishlist }), 200)
         
     @jwt_required
@@ -25,12 +26,11 @@ class WishList(Resource):
         action = request.args['action']
         product = request.get_json()
         product_id = product['id']
-        if action == "add":
-            status = add_books_to_wishlist(product_id,username)
-        if action == "delete":
-            status = delete_book_from_wishlist(product_id,username)
+        if action:
+            status = add_or_delete_books_in_wishlist(product_id,username,action)
         if status:        
-            return make_response(jsonify({"Wishlist": action }), 200)
+            return make_response(jsonify({"Wishlist": action, 
+            "status": "completed" }), 200)
         else:
             return make_response(jsonify({"response" : "action failed"}), 200)
 
@@ -52,14 +52,12 @@ class Cart(Resource):
         action = request.args['action']
         product = request.get_json()
         product_id = product['id']
-        if action == "add":
-            status = add_books_to_cart(product_id,username)
-        if action == "delete":
-            status = delete_book_from_cart(product_id,username)
+        if action:
+            status = add_or_delete_books_to_cart(product_id,username,action)
         if status:        
             return make_response(jsonify({"cart": action }), 200)
         else:
-            return make_response(jsonify({"response" : "action failed"}), 200)
+            return make_response(jsonify({"response" : "action failed or no action specified"}), 200)
     
 
 api.add_resource(Cart,'/cart')

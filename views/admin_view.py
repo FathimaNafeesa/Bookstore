@@ -51,9 +51,7 @@ class AdminPage(Resource):
     @jwt_required
     def post(self):
         action = request.args['action']
-        book_detail = request.get_json()
-        book_details = product_data_schema.load(book_detail)
-        print(book_details)
+        book_details = request.get_json()
         if action == 'add':       
             status = add_books(book_details['id'],book_details['title'], book_details['author'],book_details['image'],book_details['quantity'],book_details['price'],book_details['description'])
         if action == 'delete':

@@ -18,7 +18,7 @@ class Register(Resource):
         return make_response(jsonify({"respone": "get request called for register"}), 200)
     
     def post(self):
-        form = RegisterForm(request.form)
+        form = RegisterForm()
         user_name = form.username.data
         email = form.email.data
         phone = form.phone.data
@@ -61,7 +61,7 @@ class Login(Resource):
 
     
     def post(self):
-        form = LoginForm(request.form)
+        form = LoginForm()
         user_name = form.username.data
         password = form.password.data
         present_in_db = check_for_user_in_db(user_name, password)
