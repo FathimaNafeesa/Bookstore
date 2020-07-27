@@ -19,10 +19,9 @@ class WishList(Resource):
         wishlist = display_wishlist_or_cart(username, 0)
         return make_response(wishlist, 200)
 
-    # jwt_required
+    @jwt_required
     def post(self):
-        username = "chachu"
-        # get_jwt_identity()
+        username = get_jwt_identity()
         action = request.args['action']
         product = request.get_json()
         product_id = product['id']

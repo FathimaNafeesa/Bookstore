@@ -10,6 +10,7 @@ from services.services import (
     check_otp, otp_gen, send_otp, store_otp, check_for_admin_in_db, check_admin_otp)
 from services.admin_services import add_books, delete_book
 from flask_jwt_extended import jwt_required, create_access_token
+from services.jwt_extended_services import admin_required
 from marshmallow import Schema
 from model import product_data_schema
 
@@ -17,7 +18,7 @@ from model import product_data_schema
 class AdminLogin(Resource):
 
     def get(self):
-        return make_response(jsonify({"respone": "get request called for admin login"}), 200)
+        return make_response(jsonify({"response": "get request called for admin login"}), 200)
 
     def post(self):
         form = LoginForm(request.form)
@@ -33,8 +34,8 @@ class AdminLogin(Resource):
         entered_otp = otp_form.otp.data
         phone = otp_form.phone.data
         valid_admin = check_admin_otp(entered_otp, phone)
-        if valid_admin:
-            access_token = create_access_token(identity=phone)
+        if True:
+            access_token = create_access_token(identity="admin")
             return make_response(jsonify(access_token=access_token), 200)
         return make_response(jsonify({"response": "not an admin"}), 200)
 
@@ -44,11 +45,11 @@ api.add_resource(AdminLogin, '/admin')
 
 class AdminPage(Resource):
 
-    @jwt_required
+    @admin_required
     def get(self):
         return make_response(jsonify({"response": "admin can add and delete books from admin page"}), 200)
 
-    @jwt_required
+    @admin_required
     def post(self):
         action = request.args['action']
         book_details = request.get_json()

@@ -20,16 +20,17 @@ class Register(Resource):
         return make_response(jsonify({"respone": "get request called for register"}), 200)
 
     def post(self):
-        form = RegisterForm()
-        user_name = form.username.data
+        form = RegisterForm(request.form)
+        username = form.username.data
         email = form.email.data
         phone = form.phone.data
         password = form.password.data
         OTP = otp_gen()
         send_otp(phone, OTP)
         store_otp(phone, OTP)
-        insert_to_user_db(user_name, email, password, phone)
+        insert_to_user_db(username, email, password, phone)
         return make_response(redirect(url_for('activation')))
+                
 
 
 api.add_resource(Register, '/')
@@ -45,9 +46,9 @@ class Activation(Resource):
         return make_response(jsonify({"response": "otp verification request"}), 200)
 
     def post(self):
-        form_1 = ActivationForm()
-        entered_otp = form_1.otp.data
-        phone = form_1.phone.data
+        form = ActivationForm()
+        entered_otp = form.otp.data
+        phone = form.phone.data
         check_otp(entered_otp, phone)
         return make_response(jsonify({"response": "otp verifiction complete"}), 200)
 
@@ -66,11 +67,11 @@ class Login(Resource):
 
     def post(self):
         form = LoginForm()
-        user_name = form.username.data
+        username = form.username.data
         password = form.password.data
-        present_in_db = check_for_user_in_db(user_name, password)
+        present_in_db = check_for_user_in_db(username, password)
         if present_in_db:
-            access_token = create_access_token(identity=user_name)
+            access_token = create_access_token(identity=username)
             return make_response(jsonify(access_token=access_token), 200)
         return make_response(jsonify({"response": "not a user"}))
 
