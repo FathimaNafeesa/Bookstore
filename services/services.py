@@ -131,7 +131,7 @@ def search_books(search_parameter):
         return search_result
     except (InvalidRequestError, OperationalError, CompileError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
-x
+
 
 def check_for_admin_in_db(user_name):
     try:
