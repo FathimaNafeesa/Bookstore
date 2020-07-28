@@ -63,7 +63,7 @@ def add_or_delete_books_in_cart(user, book, action,book_quantity):
             current_product_id = book.id
             db.session.execute('UPDATE relationship_table_cart SET quantity = :quantity WHERE user_id = :user_id and product_id = :product_id',{'quantity': book_quantity,'user_id':current_user_id,'product_id':current_product_id})
         if action == "delete":
-            user.cart.remove(book).all()
+            user.cart.remove(book)
         db.session.commit()
         return True
     except (InvalidRequestError, OperationalError, CompileError):
