@@ -11,7 +11,10 @@ relationship_table = db.Table('relationship_table', db.Column('user_id', db.Inte
                               db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')))
 
 relationship_table_cart = db.Table('relationship_table_cart', db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                                   db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')))
+                                   db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')
+                                   ),db.Column('cart_id',db.Integer, primary_key=True,autoincrement=True),db.Column('quantity', db.Integer))
+
+
 
 
 class User(db.Model):
@@ -35,6 +38,8 @@ class ProductData(db.Model):
     quantity = db.Column(db.Integer)
     price = db.Column(db.Integer)
     description = db.Column(db.String(6000))
+
+    
 
 
 class Admin(db.Model):
