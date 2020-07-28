@@ -9,17 +9,19 @@ from marshmallow import Schema
 from model import product_data_schema, user_schema
 from services.cart_and_wishlist_services import display_wishlist_or_cart, add_or_delete_books
 from services.services import calling_book_details
+from services.jwt_extended_services import jwt_verify
 
 
 class WishList(Resource):
 
-    @jwt_required
+    @jwt_verify
     def get(self):
         username = get_jwt_identity()
         wishlist = display_wishlist_or_cart(username, 0)
-        return make_response(wishlist, 200)
+        return make_response(jsonify({"cart": wishlist}), 200)
+        
 
-    @jwt_required
+    @jwt_verify
     def post(self):
         username = get_jwt_identity()
         action = request.args['action']

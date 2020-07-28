@@ -6,8 +6,8 @@ from flasgger.utils import swag_from
 from app import app, api
 from forms import ActivationForm, LoginForm, RegisterForm
 from services.services import (check_for_user_in_db, check_otp, insert_to_user_db,
-                               otp_gen, send_otp, store_otp)
-from flask_jwt_extended import create_access_token
+                               otp_gen, send_otp, store_otp,store_access_token)
+from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity,get_raw_jwt
 
 # @bookstore_blueprint.route('/register/', methods=['GET', 'POST'])
 # @swag_from('register.yml', methods=['GET'])
@@ -77,3 +77,14 @@ class Login(Resource):
 
 
 api.add_resource(Login, '/login')
+
+class Logout(Resource):
+
+    @jwt_required
+    def get(self):
+        username = get_jwt_identity()
+        jti = get_raw_jwt()['jti']
+        store_access_token(jti,"blacklisted")
+        return make_response(jsonify({"msg": "Successfully logged out"}), 200)
+        
+api.add_resource(Logout, '/logout')
