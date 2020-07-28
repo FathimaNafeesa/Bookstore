@@ -112,7 +112,6 @@ def calling_book_details(sorted_books):
                 "author": each_book.author,
                 "title": each_book.title,
                 "image": each_book.image,
-                "quantity": each_book.quantity,
                 "price": each_book.price,
                 "description": each_book.description
             }

@@ -4,21 +4,35 @@ from model import User, db, ProductData, Admin, product_data_schema,relationship
 from services.services import calling_book_details
 from flask import jsonify, make_response
 from services.error_handler_service import InvalidUsageError
+import time
 
 def find_user_wishlist(username):
     try:
         user = User.query.filter_by(username=username).first()
         wishlist = user.wishlist
+        calling_book_details(wishlist)
         return wishlist
     except (InvalidRequestError, OperationalError, CompileError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
+def calculate_total_price_each_product(cart,user_id):
+    total_price_product = 0
+    for each_book in cart:
+                product_id = each_book.id
+                price = int(each_book.price)
+                row = db.session.query(relationship_table_cart).filter_by(user_id = user_id,product_id = product_id).first()
+                total_price_each_product = row.quantity * price
+                total_price_product = total_price_product + total_price_each_product
+    return total_price_product
 
 def find_user_cart(username):
     try:
         user = User.query.filter_by(username=username).first()
         cart = user.cart
-        return cart
+        user_id = user.id
+        total_price_each_product = calculate_total_price_each_product(cart,user_id)
+        cart = calling_book_details(cart)
+        return [cart,total_price_each_product]
     except (InvalidRequestError, OperationalError, CompileError):
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
@@ -31,10 +45,11 @@ def display_wishlist_or_cart(username, arg):
         }
         result = switcher.get(arg, "invalid")(username)
         if result:
-            result = product_data_schema.dumps(result)
+            return result
         else:
             result = "empty"
-        return result
+            return result
+        
     except (InvalidRequestError, OperationalError, CompileError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
@@ -63,7 +78,7 @@ def add_or_delete_books_in_cart(user, book, action,book_quantity):
             current_product_id = book.id
             db.session.execute('UPDATE relationship_table_cart SET quantity = :quantity WHERE user_id = :user_id and product_id = :product_id',{'quantity': book_quantity,'user_id':current_user_id,'product_id':current_product_id})
         if action == "delete":
-            user.cart.remove(book)
+            user.cart.remove(book).all
         db.session.commit()
         return True
     except (InvalidRequestError, OperationalError, CompileError):
