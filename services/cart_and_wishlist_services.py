@@ -10,7 +10,7 @@ def find_user_wishlist(username):
     try:
         user = User.query.filter_by(username=username).first()
         wishlist = user.wishlist
-        calling_book_details(wishlist)
+        wishlist = calling_book_details(wishlist)
         return wishlist
     except (InvalidRequestError, OperationalError, CompileError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)

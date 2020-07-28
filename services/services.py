@@ -64,6 +64,14 @@ def store_otp(phone, otp):
         raise InvalidUsageError('encoding error,try again', 500)
 
 
+def store_access_token(user,token):
+    try:
+        redis_db.set(user,token)
+        redis_db.expire(user,1000)
+    except Exception:
+        raise InvalidUsageError('encoding error,try again', 500)
+
+
 def check_otp(entered_otp, phone):
     try:
         otp = redis_db.get(phone).decode('utf-8')
