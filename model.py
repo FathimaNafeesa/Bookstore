@@ -11,8 +11,9 @@ relationship_table = db.Table('relationship_table', db.Column('user_id', db.Inte
                               db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')))
 
 relationship_table_cart = db.Table('relationship_table_cart', db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                                   db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')
-                                   ),db.Column('cart_id',db.Integer, primary_key=True,autoincrement=True),db.Column('quantity', db.Integer))
+                                   db.Column('product_id', db.Integer, db.ForeignKey('product_data.id')),
+                                   db.Column('cart_id',db.Integer, primary_key=True,autoincrement=True),
+                                   db.Column('quantity', db.Integer, nullable=False))
 
 
 
@@ -47,6 +48,14 @@ class Admin(db.Model):
     username = db.Column(db.String(25), unique=True)
     phone = db.Column(db.String(10), unique=True)
 
+
+class Order(db.Model):
+   order_id = db.Column(db.String(100),primary_key=True)
+   address = db.Column(db.String(100))
+   user = db.Column(db.Integer,db.ForeignKey('user.id'))
+   
+
+   
 
 # # SCHEMAS
 class ProductDataSchema(ma.SQLAlchemyAutoSchema):
