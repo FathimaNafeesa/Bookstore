@@ -15,24 +15,38 @@ def find_user_wishlist(username):
     except (InvalidRequestError, OperationalError, CompileError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
-def calculate_total_price_each_product(cart,user_id):
-    total_price_product = 0
-    for each_book in cart:
-                product_id = each_book.id
-                price = int(each_book.price)
-                row = db.session.query(relationship_table_cart).filter_by(user_id = user_id,product_id = product_id).first()
-                total_price_each_product = row.quantity * price
-                total_price_product = total_price_product + total_price_each_product
-    return total_price_product
+def calculate_total_price(cart,user_id):
+    try:
+        total_price_product = 0
+        books_in_cart = []
+        
+        for each_book in cart:
+            product_id = each_book.id
+            product_title = each_book.title
+            price = int(each_book.price)
+            row = db.session.query(relationship_table_cart).filter_by(user_id = user_id,product_id = product_id).first()
+            total_price_each_product = row.quantity * price
+            books_in_cart.append(
+                {
+                    "Id": product_id,
+                    "Title": product_title,
+                    "Price": price,
+                    "Quantity": row.quantity,
+                    "Amount for each book":total_price_each_product
+                }
+            )
+            total_price_product = total_price_product + total_price_each_product
+        return total_price_product,books_in_cart
+    except (InvalidRequestError, OperationalError, CompileError):
+            raise InvalidUsageError('mysql connection or syntax is improper', 500)    
 
 def find_user_cart(username):
     try:
         user = User.query.filter_by(username=username).first()
         cart = user.cart
         user_id = user.id
-        total_price_each_product = calculate_total_price_each_product(cart,user_id)
-        cart = calling_book_details(cart)
-        return [cart,total_price_each_product]
+        total_price_product,books_in_cart = calculate_total_price(cart,user_id)
+        return [total_price_product,books_in_cart]
     except (InvalidRequestError, OperationalError, CompileError):
             raise InvalidUsageError('mysql connection or syntax is improper', 500)
 

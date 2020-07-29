@@ -21,11 +21,11 @@ def jwt_verify(fn):
     def wrapper(*args, **kwargs):
         verify_jwt_in_request()
         jti = get_raw_jwt()['jti']
-        entry = redis_db.get(jti).decode('utf-8')
-        if entry == "blacklisted":
-            return make_response(jsonify({"response": "blacklisted"}), 200)
-        else:
+        entry = redis_db.get(jti)
+        if entry == None :
             return fn(*args, **kwargs)
+        elif entry.decode('utf8') == "blacklisted":
+            return make_response(jsonify({"response": "blacklisted"}), 200)
     return wrapper
 
 
