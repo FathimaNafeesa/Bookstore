@@ -18,7 +18,7 @@ class WishList(Resource):
     def get(self):
         username = get_jwt_identity()
         wishlist = display_wishlist_or_cart(username, 0)
-        return make_response(jsonify({"cart": wishlist}), 200)
+        return make_response(jsonify({"wishlist": wishlist}), 200)
         
 
     @jwt_verify
@@ -41,13 +41,13 @@ api.add_resource(WishList, '/wishlist')
 
 class Cart(Resource):
 
-    @jwt_required
+    @jwt_verify
     def get(self):
         username =  get_jwt_identity()
         result = display_wishlist_or_cart(username, 1)
-        return make_response(jsonify({"cart": result[0],"amount": result[1]}), 200)
+        return make_response(jsonify({"cart": result[1],"amount": result[0]}), 200)
 
-    @jwt_required
+    @jwt_verify
     def post(self):
         username =  get_jwt_identity()
         action = request.args['action']
