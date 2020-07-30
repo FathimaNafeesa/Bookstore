@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Order Confirmed </title>
+                    
+        <body> 
+            <h2>Dear, {{ details[1]}}</h2>
+            <h3>Order id : {{ details[2]}}</h3>
+            
+            <p>
+                Shipping Address : {{ details[3]}}
+                <div>      
+                {% for each_product in details[4] %}
+                <img src = {{ each_product['Image']}} height="100" width="100"><br align = "left">
+                Title : {{ each_product['Title']}}<br>
+                Price : {{ each_product['Price']}}<br>
+                Quantity : {{ each_product['Quantity']}}<br>
+                {% endfor %}
+                </div>
+            </p>
+
+            <h2>Total bill amount : {{ details[5] }}</h2>
+        </body> 
+    </head>
+</html>
