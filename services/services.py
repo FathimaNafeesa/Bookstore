@@ -9,9 +9,9 @@ from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
 from model import User, db, ProductData, Admin
+from app import redis_db
 
 
-redis_db = redis.Redis(host=os.getenv('redis_host'), port=os.getenv('redis_port'), db=os.getenv('redis_db'))
 
 # function for otp generation
 
@@ -146,7 +146,7 @@ def check_for_admin_in_db(user_name):
         if user:
             phone = user.phone
             return phone
-        return make_response(jsonify({'response:' 'Not an admin'}))
+        return make_response(jsonify({'response':'Not an admin'}))
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
