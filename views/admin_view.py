@@ -40,9 +40,6 @@ class AdminLogin(Resource):
         return make_response(jsonify({"response": "not an admin"}), 200)
 
 
-api.add_resource(AdminLogin, '/admin')
-
-
 class AdminPage(Resource):
 
     @admin_required
@@ -65,4 +62,5 @@ class AdminPage(Resource):
         return make_response(jsonify({"response": "action failed"}), 400)
 
 
+api.add_resource(AdminLogin, '/admin')
 api.add_resource(AdminPage, '/adminpage')

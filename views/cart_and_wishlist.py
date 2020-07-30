@@ -19,7 +19,6 @@ class WishList(Resource):
         username = get_jwt_identity()
         wishlist = display_wishlist_or_cart(username, 0)
         return make_response(jsonify({"wishlist": wishlist}), 200)
-        
 
     @jwt_verify
     def post(self):
@@ -36,30 +35,29 @@ class WishList(Resource):
             return make_response(jsonify({"response": "action failed"}), 200)
 
 
-
-
-
 class Cart(Resource):
 
-    #@jwt_verify
+    @jwt_verify
     def get(self):
-        username =  "chachu" #get_jwt_identity()
+        username = get_jwt_identity()
         result = display_wishlist_or_cart(username, 1)
-        return make_response(jsonify({"cart": result[1],"amount": result[0]}), 200)
+        return make_response(jsonify({"cart": result[1], "amount": result[0]}), 200)
 
-    #@jwt_verify
+    @jwt_verify
     def post(self):
-        username =  "chachu" #get_jwt_identity()
+        username = get_jwt_identity()
         action = request.args['action']
         product = request.get_json()
         product_id = product['id']
         product_quantity = int(product['quantity'])
         if action:
-            status = add_or_delete_books(product_id, username, action, 1,product_quantity)
+            status = add_or_delete_books(
+                product_id, username, action, 1, product_quantity)
         if status:
             return make_response(jsonify({"cart": action}), 200)
         else:
             return make_response(jsonify({"response": "action failed or no action specified"}), 200)
+
 
 api.add_resource(WishList, '/wishlist')
 api.add_resource(Cart, '/cart')

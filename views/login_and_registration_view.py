@@ -4,14 +4,12 @@ from flask import (jsonify, make_response, redirect, render_template, request,
 from flask_restful import Resource
 from flasgger.utils import swag_from
 from app import app, api
+from flask_restful_swagger import swagger
+
 from forms import ActivationForm, LoginForm, RegisterForm
 from services.services import (check_for_user_in_db, check_otp, insert_to_user_db,
-                               otp_gen, send_otp, store_otp,store_access_token)
-from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity,get_raw_jwt
-
-# @bookstore_blueprint.route('/register/', methods=['GET', 'POST'])
-# @swag_from('register.yml', methods=['GET'])
-# @swag_from('register.yml', methods=['POST'])
+                               otp_gen, send_otp, store_otp, store_access_token)
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_raw_jwt
 
 
 class Register(Resource):
@@ -30,14 +28,6 @@ class Register(Resource):
         store_otp(phone, OTP)
         insert_to_user_db(username, email, password, phone)
         return make_response(redirect(url_for('activation')))
-                
-
-
-api.add_resource(Register, '/')
-
-# @bookstore_blueprint.route('/Activation/', methods=['GET', 'POST'])
-# @swag_from('activation.yml', methods=['GET'])
-# @swag_from('activation.yml', methods=['POST'])
 
 
 class Activation(Resource):
@@ -51,13 +41,6 @@ class Activation(Resource):
         phone = form.phone.data
         check_otp(entered_otp, phone)
         return make_response(jsonify({"response": "otp verifiction complete"}), 200)
-
-
-api.add_resource(Activation, '/activation')
-
-# @bookstore_blueprint.route('/Login/', methods=['GET', 'POST'])
-# @swag_from('login.yml', methods=['GET'])
-# @swag_from('login.yml', methods=['POST'])
 
 
 class Login(Resource):
@@ -76,15 +59,17 @@ class Login(Resource):
         return make_response(jsonify({"response": "not a user"}))
 
 
-api.add_resource(Login, '/login')
-
 class Logout(Resource):
 
     @jwt_required
     def get(self):
         username = get_jwt_identity()
         jti = get_raw_jwt()['jti']
-        store_access_token(jti,"blacklisted")
+        store_access_token(jti, "blacklisted")
         return make_response(jsonify({"msg": "Successfully logged out"}), 200)
-        
+
+
+api.add_resource(Register, '/register')
+api.add_resource(Activation, '/activation')
+api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
