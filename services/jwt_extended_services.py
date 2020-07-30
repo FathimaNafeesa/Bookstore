@@ -1,7 +1,7 @@
 from functools import wraps
-from flask_jwt_extended import get_jwt_identity,verify_jwt_in_request,get_jwt_claims,get_raw_jwt
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, get_jwt_claims, get_raw_jwt
 from app import jwt
-from flask import jsonify,make_response
+from flask import jsonify, make_response
 from services.services import redis_db
 
 
@@ -16,13 +16,14 @@ def admin_required(fn):
             return fn(*args, **kwargs)
     return wrapper
 
+
 def jwt_verify(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         verify_jwt_in_request()
         jti = get_raw_jwt()['jti']
         entry = redis_db.get(jti)
-        if entry == None :
+        if entry == None:
             return fn(*args, **kwargs)
         elif entry.decode('utf8') == "blacklisted":
             return make_response(jsonify({"response": "blacklisted"}), 200)

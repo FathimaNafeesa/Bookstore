@@ -1,9 +1,10 @@
 from twilio.rest import Client
 import os
 
-def send_order_confirm_message(details): 
+
+def send_order_confirm_message(details):
     try:
-        #info = "Order Confirmed for {} [ {} ] to shipping address {}." format(details[1], details[2], details[3])
+        # info = "Order Confirmed for {} [ {} ] to shipping address {}." format(details[1], details[2], details[3])
         account_sid = os.getenv('account_sid')
         auth_token = os.getenv('auth_token')
         client = Client(account_sid, auth_token)

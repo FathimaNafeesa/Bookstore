@@ -3,14 +3,13 @@ import random as r
 
 import redis
 from flask import jsonify, make_response
-from sqlalchemy import desc,asc
+from sqlalchemy import desc, asc
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError, CompileError
 from twilio.rest import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from services.error_handler_service import InvalidUsageError
 from model import User, db, ProductData, Admin
 from app import redis_db
-
 
 
 # function for otp generation
@@ -64,10 +63,10 @@ def store_otp(phone, otp):
         raise InvalidUsageError('encoding error,try again', 500)
 
 
-def store_access_token(user,token):
+def store_access_token(user, token):
     try:
-        redis_db.set(user,token)
-        redis_db.expire(user,1000)
+        redis_db.set(user, token)
+        redis_db.expire(user, 1000)
     except Exception:
         raise InvalidUsageError('encoding error,try again', 500)
 
@@ -146,7 +145,7 @@ def check_for_admin_in_db(user_name):
         if user:
             phone = user.phone
             return phone
-        return make_response(jsonify({'response':'Not an admin'}))
+        return make_response(jsonify({'response': 'Not an admin'}))
     except (InvalidRequestError, OperationalError):
         raise InvalidUsageError('mysql connection or syntax is improper', 500)
 
