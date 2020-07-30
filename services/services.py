@@ -11,7 +11,7 @@ from services.error_handler_service import InvalidUsageError
 from model import User, db, ProductData, Admin
 
 
-redis_db = redis.Redis(host='localhost', port=6379, db=0)
+redis_db = redis.Redis(host=os.getenv('redis_host'), port=os.getenv('redis_port'), db=os.getenv('redis_db'))
 
 # function for otp generation
 

@@ -23,6 +23,7 @@ def calculate_total_price(cart,user_id):
         for each_book in cart:
             product_id = each_book.id
             product_title = each_book.title
+            image = each_book.image
             price = int(each_book.price)
             row = db.session.query(relationship_table_cart).filter_by(user_id = user_id,product_id = product_id).first()
             total_price_each_product = row.quantity * price
@@ -30,6 +31,7 @@ def calculate_total_price(cart,user_id):
                 {
                     "Id": product_id,
                     "Title": product_title,
+                    "Image": image,
                     "Price": price,
                     "Quantity": row.quantity,
                     "Amount for each book":total_price_each_product
@@ -88,6 +90,7 @@ def add_or_delete_books_in_cart(user, book, action,book_quantity):
             if book.quantity < book_quantity:
                 return make_response(jsonify({'response': "only" + str(book.quantity) + "books available"}))
             book.products_to_order.append(user)
+            db.session.commit()
             current_user_id = user.id
             current_product_id = book.id
             db.session.execute('UPDATE relationship_table_cart SET quantity = :quantity WHERE user_id = :user_id and product_id = :product_id',{'quantity': book_quantity,'user_id':current_user_id,'product_id':current_product_id})
