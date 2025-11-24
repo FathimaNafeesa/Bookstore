@@ -1,0 +1,86 @@
+{
+  "knf": {
+    "rules": [
+      {
+        "type": "alert_name_list",
+        "alert_names": [
+          "This alert is triggered when any email message is reported as junk by users -V1.0.0.0",
+          "Malicious emails were delivered and later removed -V1.0.0.2",
+          "Emails with malicious URL that were delivered and later removed -V1.0.0.3",
+          "Email messages containing malicious URL removed after delivery",
+          "Email messages containing malicious file removed after delivery",
+          "Email reported by user as junk",
+          "Email reported by user as not junk",
+          "Email messages from a campaign removed after delivery",
+          "Email messages from a campaign were delivered and later removed -V1.0.0.2"
+        ]
+      },
+      {
+        "type": "hash_match",
+        "alert_name": "wannacry_ransomware_via_sysmon",
+        "hash_path": "target.process.file.sha256",
+        "hash_list": [
+          "FE7A9EA0905151A907E248E91655EC36D9481BF7DB839ADED6D0444A66D8D730"
+        ]
+      },
+      {
+        "type": "category_ip_description",
+        "whitelisted_categories": ["SuspiciousActivity"],
+        "whitelisted_ips": [
+          "83.135.49.100", "5.45.7.100", "178.174.74.158", "93.64.21.162",
+          "109.164.253.18", "62.84.220.189", "182.74.194.122", "81.62.137.122",
+          "112.217.96.26", "195.67.15.34", "83.144.238.14", "81.62.221.10",
+          "118.238.219.96", "124.110.102.16", "12.26.44.228", "108.58.132.154",
+          "77.159.255.36", "90.80.222.57", "193.117.132.34", "1.119.186.210",
+          "101.204.45.250", "210.13.71.132", "116.227.23.83", "219.134.241.42"
+        ],
+        "description_contains": "Mass download by a single user"
+      },
+      {
+        "type": "alert_description_match",
+        "alert_name": "InitialAccess",
+        "description_list": [
+          "This alert is triggered when any email message is reported as junk by users -V1.0.0.0",
+          "Malicious emails were delivered and later removed -V1.0.0.2",
+          "Emails with malicious URL that were delivered and later removed -V1.0.0.3",
+          "Email messages containing malicious URL removed after delivery",
+          "Email messages containing malicious file removed after delivery",
+          "Email reported by user as junk",
+          "Email reported by user as not junk",
+          "Email messages from a campaign removed after delivery",
+          "Email messages from a campaign were delivered and later removed -V1.0.0.2"
+        ]
+      },
+      {
+        "type": "product_event_type",
+        "event_types": [
+          "MCAS_ALERT_CABINET_EVENT_MATCH_FILE",
+          "MCAS_ALERT_CABINET_EVENT_MATCH_AUDIT"
+        ],
+        "path": "metadata.productEventType"
+      },
+      {
+        "type": "virustotal_domain_check",
+        "alert_name": "External_user_added_to_Teams_M365",
+        "domain_path": "target.administrativeDomain",
+        "criteria": {
+          "domain_age_days": 90,
+          "malicious_threshold": 10
+        }
+      }
+    ]
+  },
+  "hengst": {
+    "rules": [
+      {
+        "type": "abuseipdb_isp_check",
+        "alert_name": "NTT_azure_multiple_failed_logins",
+        "ip_path": "principal.ip[0]",
+        "isp_contains": "hengst"
+      }
+    ]
+  },
+  "xella": {
+    "rules": []
+  }
+}
