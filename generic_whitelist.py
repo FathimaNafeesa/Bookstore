@@ -129,26 +129,32 @@ except:
     pass
 
 # =============================================================================
-# 6. CUSTOM RULES (CUSTOMER-DEFINED COMPLEX LOGIC)
+# 6. CUSTOM RULES (CLIENT-SPECIFIC)
 # =============================================================================
 
-# Import custom rules processor
+# Get customer ID and call appropriate custom rules
 try:
-    from custom_rules_processor import process_custom_rules
+    customer_id = alert_data.get("cfs.customer_id", "").upper()
     
-    whitelist = process_custom_rules(
-        custom_rules=custom_rules,
-        log_data=log_data,
-        alert_name=alert_name,
-        vt_api_key=vt_api_key,
-        abuse_api_key=abuse_api_key,
-        current_whitelist=whitelist
-    )
+    if customer_id == "KNF":
+        from knf_custom_rules import get_knf_custom_rules
+        whitelist = get_knf_custom_rules(log_data, alert_name, vt_api_key, whitelist)
+    
+    elif customer_id == "HENGST":
+        from hengst_custom_rules import get_hengst_custom_rules
+        whitelist = get_hengst_custom_rules(log_data, alert_name, abuse_api_key, whitelist)
+    
+    elif customer_id == "XELLA":
+        from xella_custom_rules import get_xella_custom_rules
+        whitelist = get_xella_custom_rules(log_data, alert_name, whitelist)
+    
+    # Add more clients here as elif blocks
+    
 except ImportError:
-    # Fallback: If custom_rules_processor not available, skip custom rules
+    # If client custom rules not available, skip
     pass
 except Exception as e:
-    # If custom rules processing fails, continue with current whitelist status
+    # If custom rules fail, continue with current whitelist status
     pass
 
 # =============================================================================
