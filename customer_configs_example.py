@@ -1,6 +1,11 @@
 """
-Example Customer Configurations
+Example Customer Configurations for action_inputs
 Each customer passes their own data as inputs to the generic script
+
+The script reads from action_inputs with structure:
+- action_inputs["alert"] = alert data with cfs.* keys
+- action_inputs["whitelist_*"] = customer whitelist lists
+- action_inputs["custom_rules"] = complex rules
 """
 
 # =============================================================================
@@ -151,13 +156,16 @@ xella_inputs = {
 # =============================================================================
 
 """
-In your playbook, you would pass these inputs like:
+In your playbook, structure action_inputs like this:
 
 For KNF:
-    sw_context.inputs = {
-        "rawLog": actual_raw_log,
-        "udmEvent": actual_udm_event,
-        "alertName": actual_alert_name,
+    action_inputs = {
+        "alert": {
+            "cfs.customer_id": "KNF",
+            "cfs.name": actual_alert_name,
+            "cfs.rawlog": actual_raw_log_json,
+            "cfs.udmevent": actual_udm_event_json,
+        },
         "whitelist_alert_names": knf_inputs["whitelist_alert_names"],
         "whitelist_hashes": knf_inputs["whitelist_hashes"],
         "whitelist_ips": knf_inputs["whitelist_ips"],
@@ -166,12 +174,17 @@ For KNF:
     }
 
 For HENGST:
-    sw_context.inputs = {
-        "rawlog": actual_raw_log,
-        "alertName": actual_alert_name,
+    action_inputs = {
+        "alert": {
+            "cfs.customer_id": "HENGST",
+            "cfs.name": actual_alert_name,
+            "cfs.rawlog": actual_raw_log_json,
+            "cfs.udmevent": "{}",
+        },
         "abuse_key": hengst_inputs["abuse_key"],
         "custom_rules": hengst_inputs["custom_rules"],
     }
 
 Then run generic_whitelist.py
+The script will read from action_inputs automatically
 """

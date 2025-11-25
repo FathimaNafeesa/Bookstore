@@ -7,7 +7,7 @@
 
 ### The Script (`generic_whitelist.py`)
 - Contains ZERO hardcoded customer data
-- Receives all whitelist data as inputs
+- Receives all whitelist data as inputs from `action_inputs`
 - Performs generic checks against provided lists
 - Returns "YES" or "NO"
 
@@ -16,19 +16,24 @@
 - Data stored in customer config/database/playbook
 - Same script runs for everyone
 
-## Input Parameters
+## Input Structure (`action_inputs`)
 
-### Basic Inputs
+### Alert Data (Nested under "alert" key)
 ```python
 {
-    "rawLog": "{}",           # JSON string of raw log
-    "rawlog": "{}",           # Alternative lowercase variant
-    "udmEvent": "{}",         # JSON string of UDM event
-    "alertName": "alert",     # Alert name (or "name")
+    "alert": {
+        "cfs.customer_id": "CustomerName",   # Customer identifier
+        "cfs.name": "alert_name",            # Alert name
+        "cfs.rawlog": "{}",                  # JSON string of raw log
+        "cfs.udmevent": "{}",                # JSON string of UDM event
+        "cfs.severity": "Medium",            # Alert severity
+        "cfs.timestamp": "2025-11-25T...",   # Alert timestamp
+        "cfs.alerthash": "hash...",          # Alert hash
+    }
 }
 ```
 
-### Simple Whitelist Lists
+### Whitelist Data (Root level of action_inputs)
 ```python
 {
     "whitelist_alert_names": [],      # List of alert names to whitelist
@@ -37,26 +42,33 @@
     "whitelist_categories": [],       # List of categories to whitelist
     "whitelist_udm_event_types": [],  # List of UDM event types to whitelist
     "whitelist_descriptions": [],     # List of descriptions to whitelist
-}
-```
-
-### API Keys (for external checks)
-```python
-{
-    "vt_api_key": "key",      # VirusTotal API key
-    "abuse_key": "key",       # AbuseIPDB API key
-}
-```
-
-### Complex Rules
-```python
-{
-    "custom_rules": [
+    
+    "vt_api_key": "key",              # VirusTotal API key (optional)
+    "abuse_key": "key",               # AbuseIPDB API key (optional)
+    
+    "custom_rules": [                 # Complex rules (optional)
         {
             "type": "rule_type",
             "params": {...}
         }
     ]
+}
+```
+
+### Complete Structure
+```python
+action_inputs = {
+    "alert": {
+        "cfs.customer_id": "CustomerName",
+        "cfs.name": "alert_name",
+        "cfs.rawlog": "{...JSON...}",
+        "cfs.udmevent": "{...JSON...}"
+    },
+    "whitelist_alert_names": ["alert1", "alert2"],
+    "whitelist_hashes": ["hash1", "hash2"],
+    "whitelist_ips": ["1.2.3.4", "5.6.7.8"],
+    "vt_api_key": "your_key",
+    "custom_rules": [...]
 }
 ```
 
@@ -146,12 +158,38 @@ Check nested field value
 }
 ```
 
-## Complete Example: KNF Customer
+## Complete Example: Brusa Customer
 
 ```python
-# In your playbook or config system, store this for KNF:
+# In your playbook or config system, structure the data like this:
 
-knf_config = {
+action_inputs = {
+    # Alert data (runtime)
+    "alert": {
+        "cfs.customer_id": "Brusa",
+        "cfs.name": "NTT_m365_graph_api_v2_alert",
+        "cfs.severity": "Medium",
+        "cfs.rawlog": """{
+            "metadata": {
+                "productEventType": "Discovery",
+                "description": "A suspect LDAP query..."
+            },
+            "principal": {
+                "hostname": "33-eag-nb007.brusa.biz",
+                "user": {"userid": "Bo.Wang"}
+            },
+            "target": {
+                "process": {
+                    "file": {
+                        "sha256": "00961e84a82ea30e7439ec..."
+                    }
+                }
+            }
+        }""",
+        "cfs.udmevent": "{}"
+    },
+    
+    # Customer whitelist config
     "whitelist_alert_names": [
         "Email reported by user as junk",
         "Email reported by user as not junk"
@@ -163,14 +201,11 @@ knf_config = {
     
     "whitelist_ips": [
         "83.135.49.100",
-        "5.45.7.100"
+        "5.45.7.100",
+        "178.174.74.158"
     ],
     
     "whitelist_categories": ["SuspiciousActivity"],
-    
-    "whitelist_udm_event_types": [
-        "MCAS_ALERT_CABINET_EVENT_MATCH_FILE"
-    ],
     
     "vt_api_key": "your_vt_key",
     
@@ -187,15 +222,7 @@ knf_config = {
     ]
 }
 
-# When running the script, merge with runtime data:
-sw_context.inputs = {
-    **knf_config,  # Customer config
-    "rawLog": actual_log,  # Runtime data
-    "udmEvent": actual_event,  # Runtime data
-    "alertName": actual_alert  # Runtime data
-}
-
-# Run generic_whitelist.py
+# Run generic_whitelist.py with this action_inputs
 # Result: whitelist = "YES" or "NO"
 ```
 
