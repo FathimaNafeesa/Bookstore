@@ -24,12 +24,8 @@ def safe_json_parse(input_str, default=None):
 alert_data = action_inputs.get("alert", {})
 
 # Parse rawlog and udmevent from alert data
-rawLog = safe_json_parse(alert_data.get("cfs.rawlog"))
-rawlog = safe_json_parse(alert_data.get("cfs.rawlog"))  # Same source, kept for compatibility
+log_data = safe_json_parse(alert_data.get("cfs.rawlog"))
 udmEvent = safe_json_parse(alert_data.get("cfs.udmevent"))
-
-# Use whichever log is available
-log_data = rawLog or rawlog
 
 # Alert name from cfs.name
 alert_name = alert_data.get("cfs.name")
