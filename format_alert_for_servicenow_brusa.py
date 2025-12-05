@@ -63,7 +63,7 @@ def get_nested_value(data, keys):
 result = []
 try:
     # Expecting the cursor results to be passed as an input parameter
-    cursor_results = sw_context.inputs.get("cursor_results", "[]")
+    cursor_results = action_inputs.get("cursor_results", "[]")
     if isinstance(cursor_results, str):
         result = json.loads(cursor_results)
     elif isinstance(cursor_results, list):
@@ -79,7 +79,7 @@ except Exception as e:
 ################## WN and Desc Creation ##################
 work_notes = ''
 description = ''
-data =sw_context.inputs["current_addInfo"]
+data = action_inputs["current_addInfo"]
 if len(result) > 0:
   tmp = result[0]
   try:
@@ -90,7 +90,7 @@ if len(result) > 0:
     pass
   try:
     desc = ast.literal_eval(tmp['description'])
-    description += 'Alert Description: ' + sw_context.inputs["description"] + '\n'
+    description += 'Alert Description: ' + action_inputs["description"] + '\n'
     for element in desc:
       try:
         val = get_nested_value(data, element['source'])
@@ -98,11 +98,11 @@ if len(result) > 0:
           description += '\n' + element['title'] + ': ' + val
       except Exception as e:
         print(e)
-    description += '\n\n' +'Event Link: ' + sw_context.inputs["event-link"]
+    description += '\n\n' +'Event Link: ' + action_inputs["event-link"]
   except Exception as e:
     pass
 else:
-  description = "{}\n\n{}".format(sw_context.inputs["description"], sw_context.inputs["event-link"])
+  description = "{}\n\n{}".format(action_inputs["description"], action_inputs["event-link"])
 ################## End of WN and Desc Creation ##################
 #!#!#!#!#!##!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!# End of Custom DB WorkNotes and Description #!#!#!#!#!##!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
 
@@ -142,21 +142,21 @@ mitre_tactics =  {
 };
 
 Additional_Info = {};
-Additional_Info["indicators"] = sw_context.inputs["indicators"];
+Additional_Info["indicators"] = action_inputs["indicators"];
 
 SNOW_ALERT = {}
 
-SNOW_ALERT["u_title"] = sw_context.inputs["alert-name"]
+SNOW_ALERT["u_title"] = action_inputs["alert-name"]
 SNOW_ALERT["classification"] = "Security"
 SNOW_ALERT["description"] = description
 SNOW_ALERT["u_company"] = "Brusa"
-SNOW_ALERT["source"] = sw_context.inputs["alert-source"] if sw_context.inputs["alert-source"] != '' else get_nested_value(data, [{'type': 'path', 'value': 'metadata.logType'}])
-SNOW_ALERT["u_detection_time"] = parse_datetime(sw_context.inputs["detected-datetime"])
-SNOW_ALERT["u_risk_score"] = sw_context.inputs["risk-score"]
-SNOW_ALERT["severity"] = sw_context.inputs["severity"].lower()
-SNOW_ALERT["u_event_link"] = sw_context.inputs["event-link"]
+SNOW_ALERT["source"] = action_inputs["alert-source"] if action_inputs["alert-source"] != '' else get_nested_value(data, [{'type': 'path', 'value': 'metadata.logType'}])
+SNOW_ALERT["u_detection_time"] = parse_datetime(action_inputs["detected-datetime"])
+SNOW_ALERT["u_risk_score"] = action_inputs["risk-score"]
+SNOW_ALERT["severity"] = action_inputs["severity"].lower()
+SNOW_ALERT["u_event_link"] = action_inputs["event-link"]
 SNOW_ALERT["additional_info"] = Additional_Info
-SNOW_ALERT["message_key"] = sw_context.inputs["tracking-id"]
-#SNOW_ALERT[""] = sw_context.inputs[""];
+SNOW_ALERT["message_key"] = action_inputs["tracking-id"]
+#SNOW_ALERT[""] = action_inputs[""];
 
 sw_outputs.append({"snow-alert":SNOW_ALERT});
