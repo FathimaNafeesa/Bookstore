@@ -96,22 +96,22 @@ parsed_uri = "not available"
 
 try:
     # Handle different URI patterns
-    for uri in uris:
-        # Transform knf- URIs to ndr1-
-        if uri.startswith("https://knf-"):
-            parsed_uri = uri.split("://")[0] + "://ndr1-" + uri.split("://")[-1]
-            break
-        # Accept ndr1- and helaba-europe URIs as-is
-        elif uri.startswith("https://ndr1-") or uri.startswith("https://helaba-europe"):
-            parsed_uri = uri
-            break
-except:
-    # If uris is a single string (not iterable), use it directly
-    try:
-        if isinstance(uris, str):
+    if isinstance(uris, list):
+        for uri in uris:
+            # Transform knf- URIs to ndr1-
+            if uri.startswith("https://knf-"):
+                parsed_uri = uri.split("://")[0] + "://ndr1-" + uri.split("://")[-1]
+                break
+            # Accept ndr1- and helaba-europe URIs as-is
+            elif uri.startswith("https://ndr1-") or uri.startswith("https://helaba-europe"):
+                parsed_uri = uri
+                break
+    else:
+        # If uris is a single string (not iterable), use it directly
+        if isinstance(uris, str) and uris:
             parsed_uri = uris
-    except:
-        pass
+except:
+    pass
 
 output_data['eventLink'] = parsed_uri
 
